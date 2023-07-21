@@ -70,8 +70,7 @@ namespace ArchSmarter_Addin_Bootcamp
             double ele1 = 0;
             double floorHeight1 = 15;
 
-            List<Level> projectLevels = new List<Level>();
-            List<int> levelIndex = new List<int>();
+            
 
             //for every number in 230, create a floor plan         
             
@@ -80,8 +79,7 @@ namespace ArchSmarter_Addin_Bootcamp
                 ele1 = i * floorHeight1;
                 Level newLevel = Level.Create(doc, ele1); //this is not working                          
                 newLevel.Name = "New Level_" + i.ToString();
-                projectLevels.Add(newLevel);
-                levelIndex.Add(i);
+                
 
                 if (i % 3 == 0 && i % 5 != 0) //not by 5 as well
                 {
