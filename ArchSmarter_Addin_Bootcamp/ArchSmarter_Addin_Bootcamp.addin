@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Command">
+    <Text>ArchSmarter_Addin_Bootcamp - Command 1</Text>
+    <Description>Some description for ArchSmarter_Addin_Bootcamp</Description>
+    <Assembly>ArchSmarter_Addin_Bootcamp.dll</Assembly>
+    <FullClassName>ArchSmarter_Addin_Bootcamp.Command1</FullClassName>
+    <ClientId>3A0B13B4-92FA-4559-90EA-E9A2EE748162</ClientId>
+    <VendorId>RidgeandPartners</VendorId>
+    <VendorDescription>RDG-AMYBECKENHAM</VendorDescription>
+  </AddIn>
+  <AddIn Type="Command">
+    <Text>ArchSmarter_Addin_Bootcamp - Command 2</Text>
+    <Description>Some description for ArchSmarter_Addin_Bootcamp</Description>
+    <Assembly>ArchSmarter_Addin_Bootcamp.dll</Assembly>
+    <FullClassName>ArchSmarter_Addin_Bootcamp.Command2</FullClassName>
+    <ClientId>D0586A53-D5FE-4695-BBCB-89B4DCE1E634</ClientId>
+    <VendorId>RidgeandPartners</VendorId>
+    <VendorDescription>RDG-AMYBECKENHAM</VendorDescription>
+  </AddIn>
+	<AddIn Type="Command">
+		<Text>ArchSmarter_Addin_Bootcamp - Module01Challenge</Text>
+		<Description>Some description for ArchSmarter_Addin_Bootcamp</Description>
+		<Assembly>ArchSmarter_Addin_Bootcamp.dll</Assembly>
+		<FullClassName>ArchSmarter_Addin_Bootcamp.Module01Challenge</FullClassName>
+		<ClientId>4B6A70E2-6C8D-420A-802F-D903AE6FFD8E</ClientId>
+		<VendorId>RidgeandPartners</VendorId>
+		<VendorDescription>RDG-AMYBECKENHAM</VendorDescription>
+	</AddIn>
+  <AddIn Type="Application">
+    <Name>ArchSmarter_Addin_Bootcamp</Name>
+    <Assembly>ArchSmarter_Addin_Bootcamp.dll</Assembly>
+    <FullClassName>ArchSmarter_Addin_Bootcamp.App</FullClassName>
+    <ClientId>9897938C-4E7E-4D20-A368-AC65116ECF75</ClientId>
+    <VendorId>RidgeandPartners</VendorId>
+    <VendorDescription>RDG-AMYBECKENHAM</VendorDescription>
+  </AddIn>
+</RevitAddIns>
