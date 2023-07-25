@@ -25,14 +25,13 @@ namespace ArchSmarter_Addin_Bootcamp
             // this is a variable for the current Revit model
             Document doc = uiapp.ActiveUIDocument.Document;
 
-            // My Code starts here
-
+            
             //declare a number variable and set it to 250
             int num1 = 250;
             //declare a starting elevation variable and set it to 0
-            
+            double ele1 = 0;
             //declare a floor height variable and set it to 15
-            
+            double floorHeight1 = 15;
 
             //create filters to collect the floor, ceiling plan views
             FilteredElementCollector ViewCollector = new FilteredElementCollector(doc);
@@ -62,13 +61,8 @@ namespace ArchSmarter_Addin_Bootcamp
 
             //create a transaction to lock the model
             Transaction t = new Transaction(doc);
-            t.Start("Create 250 floor levels");
-
-
-            
-            double ele1 = 0;
-            double floorHeight1 = 15;
-                        
+            t.Start("Create 250 floor levels");            
+                                  
 
             //for every number in 230, create a floor plan         
             
