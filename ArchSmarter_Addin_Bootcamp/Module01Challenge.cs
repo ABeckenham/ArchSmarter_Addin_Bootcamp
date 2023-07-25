@@ -65,12 +65,10 @@ namespace ArchSmarter_Addin_Bootcamp
             t.Start("Create 250 floor levels");
 
 
-            //QQQQ - where do i put this transaction?
-
+            
             double ele1 = 0;
             double floorHeight1 = 15;
-
-            
+                        
 
             //for every number in 230, create a floor plan         
             
@@ -79,26 +77,34 @@ namespace ArchSmarter_Addin_Bootcamp
                 ele1 = i * floorHeight1;
                 Level newLevel = Level.Create(doc, ele1); //this is not working                          
                 newLevel.Name = "New Level_" + i.ToString();
-                
 
-                if (i % 3 == 0 && i % 5 != 0) //not by 5 as well
+
+
+                if (i % 3 == 0 && i % 5 == 0) //this is not working
+                {
+                    //create a sheet 
+                    ViewSheet newSheet = ViewSheet.Create(doc, sheetCollector.FirstElement().Id);
+                    newSheet.Name = "FIZZBUZZ_" + i;
+                    //create floorplan 
+                    ViewPlan floorPlan = ViewPlan.Create(doc, floorPlanVFT.Id, newLevel.Id);
+                    floorPlan.Name = "FIZZBUZZ_" + i;
+                    XYZ p = new XYZ(1, 1, 1);
+                    Viewport.Create(doc, newSheet.Id, floorPlan.Id, p );
+
+                }
+                else if (i % 3 == 0) //not by 5 as well
                 {
                     //create floorplan 
                     ViewPlan floorPlan = ViewPlan.Create(doc, floorPlanVFT.Id, newLevel.Id);
                     floorPlan.Name = "FIZZ_" + i;
                 }
-                else if (i % 5 == 0 && i % 3 != 0) //not by 3 as well
+                else if (i % 5 == 0) //not by 3 as well
                 {
                     //create a ceilingplan
                     ViewPlan ceilingPlan = ViewPlan.Create(doc, ceilingPlanVFT.Id, newLevel.Id);
                     ceilingPlan.Name = "BUZZ_" + i;
                 }
-                else if (i % 3 == 0 && i % 5 == 0) //this is not working
-                {
-                    //create a sheet 
-                    ViewSheet newSheet = ViewSheet.Create(doc, sheetCollector.FirstElement().Id);
-                    newSheet.Name = "FIZZBUZZ_" + i;
-                }
+                
             }
 
             //make a change in the revit model
