@@ -26,13 +26,22 @@
 		<ClientId>4B6A70E2-6C8D-420A-802F-D903AE6FFD8E</ClientId>
 		<VendorId>RidgeandPartners</VendorId>
 		<VendorDescription>RDG-AMYBECKENHAM</VendorDescription>
+    </AddIn>
+	<AddIn Type="Command">
+		<Text>ArchSmarter_Addin_Bootcamp - Module02Demo</Text>
+		<Description>Some description for ArchSmarter_Addin_Bootcamp</Description>
+		<Assembly>ArchSmarter_Addin_Bootcamp.dll</Assembly>
+		<FullClassName>ArchSmarter_Addin_Bootcamp.Module02Demo</FullClassName>
+		<ClientId>D9DD9D0B-7E17-4134-B017-F4269CE8A6B6</ClientId>
+		<VendorId>RidgeandPartners</VendorId>
+		<VendorDescription>RDG-AMYBECKENHAM</VendorDescription>
 	</AddIn>
 	<AddIn Type="Command">
 		<Text>Delete Backup Files</Text>
 		<Description>Some description for ArchSmarter_Addin_Bootcamp</Description>
 		<Assembly>ArchSmarter_Addin_Bootcamp.dll</Assembly>
 		<FullClassName>ArchSmarter_Addin_Bootcamp.cmdDeleteBackups</FullClassName>
-		<ClientId>{E0FC1412-AF9E-4034-A211-32387056B316}</ClientId>
+		<ClientId>E0FC1412-AF9E-4034-A211-32387056B316</ClientId>
 		<VendorId>RidgeandPartners</VendorId>
 		<VendorDescription>RDG-AMYBECKENHAM</VendorDescription>
 	</AddIn>
