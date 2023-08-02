@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="App.cs" />
     <Compile Include="cmdDeleteBackups.cs" />
+    <Compile Include="Module02Challenge.cs" />
     <Compile Include="Module02Demo.cs" />
     <Compile Include="Module01Challenge.cs" />
     <Compile Include="Utils\ButtonDataClass.cs" />
