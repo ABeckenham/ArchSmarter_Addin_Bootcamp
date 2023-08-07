@@ -2,12 +2,19 @@
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Mechanical;
+using Autodesk.Revit.DB.Plumbing;
+using Autodesk.Revit.DB.Visual;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Dynamic;
+using System.Net;
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Windows.Controls;
 
 #endregion
 
@@ -22,6 +29,8 @@ namespace ArchSmarter_Addin_Bootcamp
             UIApplication uiapp = commandData.Application;
 
             // this is a variable for the current Revit model
+            // below is needed because you could technically have multiple documents open at once.
+            // So this variable gets the current active doc
             Document doc = uiapp.ActiveUIDocument.Document;
 
             //generate revit elements from model lines
@@ -34,34 +43,38 @@ namespace ArchSmarter_Addin_Bootcamp
 
             
 
-            //filter elements for curves
-            List<CurveElement> allCurves = new List<CurveElement>(); 
-            foreach (Element elem in pickList)
-            {
-                if (elem is CurveElement) //if the element is of the curveelement class
-                {
-                    allCurves.Add(elem as CurveElement);
-                }
-            }
+            //filter elements to find just curves
+            //List<CurveElement> allCurves = new List<CurveElement>(); 
+            //foreach (Element elem in pickList)
+            //{
+                //if (elem is CurveElement) //if the element is of the curveelement class
+                //{
+                //    allCurves.Add(elem as CurveElement);
+               // }
+           // }
             
-            //do i need the above list?
+            //do i need the above list? i think no
 
             //filter more specificially 
 
             List<CurveElement> modelCurves = new List<CurveElement>();
             foreach (Element elem in pickList)
             {
-                
                 if(elem is CurveElement)
                 {
                     // cast Element type to a CurveElement type 
                     // they already are Curve elements because of the If Statement
                     // casting them to their more specific CurveElement Type gives us
                     // access different parameters
+                   // CurveElement curveElem = (CurveElementr)elem;
+                   
                     CurveElement curveElem = elem as CurveElement;
                     if (curveElem.CurveElementType == CurveElementType.ModelCurve)
                     {
+                        Curve currentCurve = curveElem.GeometryCurve;
+                                                
                         modelCurves.Add(curveElem);
+                                               
                     }
                 }
             }
@@ -69,37 +82,118 @@ namespace ArchSmarter_Addin_Bootcamp
             TaskDialog.Show("Selected Elements", "  Selected in total: " + pickList.Count.ToString() 
                 + "Selected ModelLines: " + modelCurves.Count.ToString());
 
-            foreach(CurveElement curCurve in modelCurves)
+            FilteredElementCollector projlevels = new FilteredElementCollector(doc);
+            projlevels.OfCategory(BuiltInCategory.OST_Levels);
+
+            FilteredElementCollector projDuct = new FilteredElementCollector(doc);
+            projDuct.OfClass(typeof(DuctType));
+
+            DuctType ductType = null;
+            foreach (DuctType curDuct in projDuct)
             {
-                //loop through selection and create revit elements based on line styles
-                // collect the geometry of each line and store it in variable curve
-                Curve curve = curCurve.GeometryCurve;
-                //get the start and end point of each line
-                XYZ startPoint = curve.GetEndPoint(0);
-                XYZ endPoint = curve.GetEndPoint(1);
-                //we have to create variables to store the information about the element
-                //and we get that information using a method.
-                //???we have to case it from an element type to a specific style? Dont understand why????
-                GraphicsStyle curStyle = curCurve.LineStyle as GraphicsStyle;
-
-                Debug.Print(curStyle.Name);
-
-                //Create model elements based on the name of the modelline type
-                //A-GLAZ - Storefront wall
-                //A-WALL - Generic 8" wall
-                //M-DUCT - Default duct
-                //P-PIPE - Default pipe
+                if (curDuct.Name == "Default Duct")
+                {
+                    ductType = curDuct;
+                    break;
+                }
             }
 
+            FilteredElementCollector projPipe = new FilteredElementCollector(doc);
+            projPipe.OfClass(typeof(PipeType));
 
+            PipeType pipeType = null;
+            foreach (PipeType curPipe in projPipe)
+            {
+                if (curPipe.Name == "Default Pipe")
+                {
+                    pipeType = curPipe;
+                    break;
+                }
+            }
 
+            WallType genWall = GetWallTypeByName(doc, "Generic 8\"");
+            WallType storeWall = GetWallTypeByName(doc, "Storefront");
+            MEPSystemType ductSystemType = GetSystemTypeByName(doc, "Supply Air");
+            MEPSystemType pipeSystemType = GetSystemTypeByName(doc, "Domestic Hot Water");
 
-            //BONUS - create a custom method to "get wall type by name", "get system type by name",
-            //"create wall", "create pipe", "crate duct"
+            //create transaction with using statement
 
+            using (Transaction t = new Transaction(doc))
+            {
+                t.Start("create revit elements");                                                               
 
+                foreach (CurveElement curCurve in modelCurves)
+                {
+                    Curve curve = curCurve.GeometryCurve;
+                    XYZ startPoint = curve.GetEndPoint(0);
+                    XYZ endPoint = curve.GetEndPoint(1);
+                    GraphicsStyle curStyle = curCurve.LineStyle as GraphicsStyle;
+
+                    switch (curStyle.Name)
+                    {
+                        case "A - GLAZ":
+                            Wall.Create(doc, curve, storeWall.Id, projlevels.FirstElement().Id, 20, 0, false, false);
+                            break;
+
+                        case "A-WALL":
+                            Wall.Create(doc, curve, genWall.Id, projlevels.FirstElement().Id, 20, 0, false, false);
+                            break;
+
+                        case "M-DUCT":
+                            
+                            Duct.Create(doc, ductSystemType.Id, ductType.Id, projlevels.FirstElement().Id, startPoint, endPoint);
+                            break;
+
+                        case "P-PIPE":
+                            
+                            Pipe.Create(doc, pipeSystemType.Id, pipeType.Id, projlevels.FirstElement().Id, startPoint, endPoint);
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+                t.Commit();
+                                
+            }                  
+            //BONUS - create a custom method to "get wall type by name", "get system type by name", DONE
+            //"create wall", "create pipe", "crate duct" 
             return Result.Succeeded;
         }
+
+        //my methods below
+        internal WallType GetWallTypeByName(Document doc, String typeName)
+        {
+            FilteredElementCollector collector = new FilteredElementCollector(doc);
+            collector.OfClass(typeof(WallType));
+
+            foreach (WallType curType in collector)
+            {
+                if (curType.Name == typeName)
+                {
+                    return curType;                    
+                }
+            }
+            return null;
+        }
+
+
+        internal MEPSystemType GetSystemTypeByName(Document doc, string typeName)
+        {
+            FilteredElementCollector collector = new FilteredElementCollector(doc);
+            collector.OfClass(typeof(MEPSystemType));
+                        
+            foreach (MEPSystemType curType in collector)
+            {
+                if (curType.Name == typeName)
+                {
+                    return curType;
+                }
+            }
+            return null;
+        }
+
+
         internal static PushButtonData GetButtonData()
         {
             // use this method to define the properties for this command in the Revit ribbon
