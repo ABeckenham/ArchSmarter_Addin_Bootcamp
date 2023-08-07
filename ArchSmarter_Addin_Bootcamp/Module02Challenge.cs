@@ -31,17 +31,11 @@ namespace ArchSmarter_Addin_Bootcamp
             // this is a variable for the current Revit model
             // below is needed because you could technically have multiple documents open at once.
             // So this variable gets the current active doc
-            Document doc = uiapp.ActiveUIDocument.Document;
-
-            //generate revit elements from model lines
-
-
+            Document doc = uiapp.ActiveUIDocument.Document;            
             //prompt to select model lines 
             //first select the current UI in revit
             UIDocument uidoc = uiapp.ActiveUIDocument;
-            IList<Element> pickList = uidoc.Selection.PickElementsByRectangle("Select Elements");
-
-            
+            IList<Element> pickList = uidoc.Selection.PickElementsByRectangle("Select Elements");            
 
             //filter elements to find just curves
             //List<CurveElement> allCurves = new List<CurveElement>(); 
@@ -83,7 +77,7 @@ namespace ArchSmarter_Addin_Bootcamp
                 + "Selected ModelLines: " + modelCurves.Count.ToString());
 
             FilteredElementCollector projlevels = new FilteredElementCollector(doc);
-            projlevels.OfCategory(BuiltInCategory.OST_Levels);
+            projlevels.OfClass(typeof(Level));
 
             FilteredElementCollector projDuct = new FilteredElementCollector(doc);
             projDuct.OfClass(typeof(DuctType));
@@ -91,7 +85,7 @@ namespace ArchSmarter_Addin_Bootcamp
             DuctType ductType = null;
             foreach (DuctType curDuct in projDuct)
             {
-                if (curDuct.Name == "Default Duct")
+                if (curDuct.Name == "Default")
                 {
                     ductType = curDuct;
                     break;
@@ -104,14 +98,14 @@ namespace ArchSmarter_Addin_Bootcamp
             PipeType pipeType = null;
             foreach (PipeType curPipe in projPipe)
             {
-                if (curPipe.Name == "Default Pipe")
+                if (curPipe.Name == "Default")
                 {
                     pipeType = curPipe;
                     break;
                 }
             }
 
-            WallType genWall = GetWallTypeByName(doc, "Generic 8\"");
+            WallType genWall = GetWallTypeByName(doc, @"Generic - 8""");
             WallType storeWall = GetWallTypeByName(doc, "Storefront");
             MEPSystemType ductSystemType = GetSystemTypeByName(doc, "Supply Air");
             MEPSystemType pipeSystemType = GetSystemTypeByName(doc, "Domestic Hot Water");
@@ -124,14 +118,12 @@ namespace ArchSmarter_Addin_Bootcamp
 
                 foreach (CurveElement curCurve in modelCurves)
                 {
-                    Curve curve = curCurve.GeometryCurve;
-                    XYZ startPoint = curve.GetEndPoint(0);
-                    XYZ endPoint = curve.GetEndPoint(1);
+                    Curve curve = curCurve.GeometryCurve;                    
                     GraphicsStyle curStyle = curCurve.LineStyle as GraphicsStyle;
 
                     switch (curStyle.Name)
                     {
-                        case "A - GLAZ":
+                        case "A-GLAZ":
                             Wall.Create(doc, curve, storeWall.Id, projlevels.FirstElement().Id, 20, 0, false, false);
                             break;
 
@@ -140,13 +132,15 @@ namespace ArchSmarter_Addin_Bootcamp
                             break;
 
                         case "M-DUCT":
-                            
-                            Duct.Create(doc, ductSystemType.Id, ductType.Id, projlevels.FirstElement().Id, startPoint, endPoint);
+                            XYZ startPointd = curve.GetEndPoint(0);
+                            XYZ endPointd = curve.GetEndPoint(1);
+                            Duct.Create(doc, ductSystemType.Id, ductType.Id, projlevels.FirstElement().Id, startPointd, endPointd);
                             break;
 
                         case "P-PIPE":
-                            
-                            Pipe.Create(doc, pipeSystemType.Id, pipeType.Id, projlevels.FirstElement().Id, startPoint, endPoint);
+                            XYZ startPointp = curve.GetEndPoint(0);
+                            XYZ endPointp = curve.GetEndPoint(1);
+                            Pipe.Create(doc, pipeSystemType.Id, pipeType.Id, projlevels.FirstElement().Id, startPointp, endPointp);
                             break;
 
                         default:
